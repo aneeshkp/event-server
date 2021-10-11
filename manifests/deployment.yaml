@@ -1,0 +1,45 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: eventserver
+  labels:
+    name: eventserver
+---    
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: cloud-native-eventserver
+  namespace: eventserver
+  labels:
+    app:  eventserver
+spec:
+  selector:
+    matchLabels:
+      app: eventserver
+  template:
+    metadata:
+      labels:
+        app: eventserver
+    spec:
+      dnsPolicy: ClusterFirstWithHostNet
+      containers:
+        - name: cloud-native-eventserver
+          image: quay.io/aneeshkp/cloud-native-eventserver:latest
+          ports:
+            - name: event-server-port
+              containerPort: 9198
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: eventserver-service
+  namespace: eventserver
+  labels:
+    app: eventserver
+spec:
+  ports:
+    - name: event-server-port
+      port: 9198
+  selector:
+    app: eventserver
+  type: ClusterIP              
